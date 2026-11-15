@@ -1,6 +1,13 @@
+import { Capacitor } from '@capacitor/core'
+import { Browser } from '@capacitor/browser'
 import { supabase, LOGO, APP_NAME } from '../lib/supabase'
 export default function Login() {
-  const go = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
+  const go = async () => {
+    if (Capacitor.isNativePlatform()) {
+      const { data } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'pizzasocia://auth', skipBrowserRedirect: true } })
+      if (data?.url) await Browser.open({ url: data.url })
+    } else supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
+  }
   return (
     <div className="h-full grid place-items-center bg-gradient-to-br from-orange-600 via-red-600 to-yellow-500 p-4">
       <div className="bg-b2 rounded-2xl p-8 w-full max-w-sm text-center shadow-2xl">
